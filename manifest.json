@@ -1,0 +1,33 @@
+{
+  "manifest_version": 3,
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEApeh/MqGbxr5LxzUGBG+qlmQkJAa9Gsn/58pIIWzlXIBFl7nzP3nPJjhZbKGamovCTD4vEX7mLFq/g92Sfrd8RwOvVZo+z7DLU5jHZU1RSJko+lcnWj/mbfX9X2yuq5zLnuvlV3XXtycudc+0sfQE6lrnsb1ZOAk2ooDFUbKShpkRkR8Qhx5eyhsT0V0bBjerOVxpCZPLLCdQUlguBZamAycCB942U4iEIKusR3zCK5mf/uj3Z0PY1/B430NhHrI590Q8TJx1TItasjxoKMfMrggyKZtKHMjcxhVdeRGriMFIkTX2ZLOn+BvSnHLHK7nbQ1yiW/QE5S9PgLevydqZfwIDAQAB",
+  "name": "TPM-FIDO2 Platform Authenticator",
+  "version": "1.0.0",
+  "description": "WebAuthn platform authenticator using TPM and fingerprint verification",
+  "permissions": [
+    "nativeMessaging"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_start",
+      "all_frames": true,
+      "world": "ISOLATED"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["inject.js"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}
