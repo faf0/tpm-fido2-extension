@@ -25,6 +25,7 @@ fi
 # Detect browser config directory
 CHROME_DIR="$HOME/.config/google-chrome/NativeMessagingHosts"
 CHROMIUM_DIR="$HOME/.config/chromium/NativeMessagingHosts"
+BRAVE_DIR="$HOME/.config/BraveSoftware/Brave-Browser/NativeMessagingHosts"
 
 INSTALL_DIRS=()
 if [ -d "$HOME/.config/google-chrome" ]; then
@@ -33,9 +34,12 @@ fi
 if [ -d "$HOME/.config/chromium" ]; then
     INSTALL_DIRS+=("$CHROMIUM_DIR")
 fi
+if [ -d "$HOME/.config/BraveSoftware/Brave-Browser" ]; then
+    INSTALL_DIRS+=("$BRAVE_DIR")
+fi
 
 if [ ${#INSTALL_DIRS[@]} -eq 0 ]; then
-    echo "Warning: No Chrome/Chromium config directory found"
+    echo "Warning: No Chrome/Chromium/Brave config directory found"
     echo "Creating Chrome directory..."
     INSTALL_DIRS=("$CHROME_DIR")
 fi
