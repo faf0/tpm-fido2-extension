@@ -10,3 +10,12 @@ Thumbs.db
 
 # Claude
 .claude/
+
+# Firefox extension
+tpmfido.xpi
+
+# Copies
+chrome/*.js
+firefox/*.js
+chrome/icons/
+firefox/icons/
