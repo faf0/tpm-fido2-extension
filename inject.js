@@ -103,11 +103,76 @@
     return serialized;
   }
 
+  // Check if a domain ends with any allowed eTLD
+  function endsWithAllowedSuffix(domain) {
+    // Allowlist of the most common eTLDs. Checked only when the RP wants to use
+    // a parent domain of the origin's domain. Allows common domains without
+    // pulling in a Public Suffix List.
+    const ALLOWED_PARENT_SUFFIXES = [
+      'com',
+      'org',
+      'net',
+      'edu',
+      'gov',
+      'to',
+      'co.uk',
+      'com.au',
+      'com.br',
+      'com.mx',
+      'com.ar',
+      'com.co',
+    ];
+
+    return ALLOWED_PARENT_SUFFIXES.some(suffix => {
+      return domain.endsWith('.' + suffix);
+    });
+  }
+
+  // validate RP ID for credentials get
+  function validateRpId(rpId, hostname) {
+    // Default to current hostname if rpId is not provided
+    if (!rpId) {
+      return hostname;
+    }
+
+    if (rpId === hostname) {
+      return hostname;
+    }
+
+    if (hostname === 'localhost') {
+      if (rpId !== 'localhost') {
+        throw new Error(`rpId '${rpId}' is not valid for origin 'localhost'`);
+      }
+      return rpId;
+    }
+
+    // Validate rpId format
+    if (!rpId.includes('.') || rpId.startsWith('.') || rpId.endsWith('.')) {
+      throw new Error('Invalid rpId');
+    }
+
+    // rpId must be a parent domain of hostname (one or more levels up)
+    if (!hostname.endsWith('.' + rpId)) {
+      throw new Error(`rpId '${rpId}' is not a parent domain of origin '${hostname}'`);
+    }
+
+    // Check if rpId ends with any allowed eTLD suffix
+    if (!endsWithAllowedSuffix(rpId)) {
+      throw new Error(
+        `rpId '${rpId}' is not allowed. ` +
+        "Only parent domains under common registrable suffixes (e.g., '.com', '.co.uk') are supported."
+      );
+    }
+
+    return rpId;
+  }
+
   // Serialize PublicKeyCredentialRequestOptions for JSON transport
   function serializeGetOptions(options) {
+    const rpId = validateRpId(options?.rpId, location.hostname);
     const serialized = {
       challenge: arrayBufferToBase64(options.challenge),
-      rpId: options.rpId,
+      rpId: rpId,
       timeout: options.timeout,
       userVerification: options.userVerification,
     };
