@@ -15,30 +15,38 @@
 
   // ============== Serialization Helpers ==============
 
+  /**
+   * Convert ArrayBuffer to base64url string (URL-safe, no padding)
+   * Used for all WebAuthn binary fields per spec:
+   * https://www.w3.org/TR/webauthn-3/#base64url-encoding
+   */
   function arrayBufferToBase64(buffer) {
     const bytes = new Uint8Array(buffer);
     let binary = '';
     for (let i = 0; i < bytes.length; i++) {
       binary += String.fromCharCode(bytes[i]);
     }
-    return btoa(binary);
+    return btoa(binary)
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=+$/, '');
   }
 
-  function base64ToArrayBuffer(base64) {
-    const binary = atob(base64);
+  /**
+   * Convert base64url string (with or without padding) to ArrayBuffer
+   * Handles base64url input as used in WebAuthn JSON structures
+   */
+  function base64ToArrayBuffer(base64url) {
+    // Convert base64url to base64
+    const base64 = base64url.replace(/-/g, '+').replace(/_/g, '/');
+    // Add padding if needed
+    const padded = base64 + '='.repeat((3 * base64.length) % 4);
+    const binary = atob(padded);
     const bytes = new Uint8Array(binary.length);
     for (let i = 0; i < binary.length; i++) {
       bytes[i] = binary.charCodeAt(i);
     }
     return bytes.buffer;
-  }
-
-  function base64UrlToBase64(base64url) {
-    let base64 = base64url.replace(/-/g, '+').replace(/_/g, '/');
-    while (base64.length % 4) {
-      base64 += '=';
-    }
-    return base64;
   }
 
   // Serialize PublicKeyCredentialCreationOptions for JSON transport
